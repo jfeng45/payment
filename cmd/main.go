@@ -2,12 +2,12 @@ package main
 
 import (
 	ycq "github.com/jetbasrawi/go.cqrs"
+	"github.com/jfeng45/gmessaging"
 	"github.com/jfeng45/payment/app"
 	"github.com/jfeng45/payment/app/config"
 	"github.com/jfeng45/payment/app/container"
 	"github.com/jfeng45/payment/app/container/containerhelper"
 	"github.com/jfeng45/payment/app/logger"
-	"github.com/jfeng45/gmessaging"
 	"github.com/jfeng45/payment/domain/command"
 	"github.com/jfeng45/payment/domain/model"
 	"log"
@@ -20,11 +20,11 @@ func main() {
 	if err != nil {
 		log.Println("err:", err)
 	}
-	testMySql(c)
-	//testSubscribe(c)
+	//testMySql(c)
+	testSubscribe(c)
 }
 func testMySql(c container.Container) {
-	//testGetPayment(container)
+	//testGetPayment(c)
 	testMakePayment(c)
 }
 func testSubscribe(c container.Container) {
@@ -58,7 +58,7 @@ func testSubscribe(c container.Container) {
 
 func testGetPayment(c container.Container) {
 	//It is uid in database. Make sure you have it in database, otherwise it won't find it.
-	id := 1
+	id := 2
 	gpuc, err := containerhelper.BuildGetPaymentUseCase(c)
 	if err != nil {
 		logger.Log.Fatalf("getPaymentUseCase interface build failed:%+v\n", err)
@@ -78,9 +78,10 @@ func testMakePayment(c container.Container) {
 	}
 	//id is auto generated in database
 	var id int
+	var completionTime time.Time
 	p := model.Payment{id,1,32,20,
-		model.PAYMENT_STATUS_COMPLETED,model.PAYMENT_METHOD_ALIPAY,"1",
-		time.Now(), time.Now()}
+		model.PAYMENT_STATUS_COMPLETED,model.PAYMENT_METHOD_ALIPAY,"3",
+		time.Now(), completionTime}
 	payment, err := mpuc.MakePayment(&p)
 	if err != nil {
 		logger.Log.Errorf("makePaymentUseCase failed failed:%+v\n", err)

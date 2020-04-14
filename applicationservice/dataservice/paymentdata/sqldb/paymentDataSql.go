@@ -2,22 +2,20 @@
 package sqldb
 
 import (
-"database/sql" 
-_ "github.com/go-sql-driver/mysql"
-"github.com/jfeng45/payment/app/logger"
-"github.com/jfeng45/payment/domain/model"
-"github.com/jfeng45/payment/tool"
-"github.com/jfeng45/payment/tool/gdbc"
-"github.com/pkg/errors"
-"time"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jfeng45/payment/app/logger"
+	"github.com/jfeng45/payment/domain/model"
+	"github.com/jfeng45/payment/tool/gdbc"
+	"github.com/jfeng45/payment/tool/timea"
+	"github.com/pkg/errors"
 )
 
 const (
-	//QUERY_PAYMENT_BY_ID   string = "SELECT * FROM payment where id =?"
-	QUERY_PAYMENT_BY_ID   string = "SELECT id, payment_method, status, created_time FROM payment where id =?"
+	QUERY_PAYMENT_BY_ID   string = "SELECT id, source_account, target_account, amount, payment_method, status, " +
+		"order_number, created_time, completion_time FROM payment where id =?"
 	QUERY_PAYMENT_BY_ORDER_NUMBER        = "SELECT * FROM payment where order_number =?"
 	QUERY_PAYMENT                = "SELECT * FROM payment "
-	//UPDATE_PAYMENT               = "update userinfo set username=?, department=?, created=? where uid=?"
 	INSERT_PAYMENT               = "INSERT payment SET source_account=?,target_account=?, amount=?, payment_method=?," +
 		"status=?, order_number =?,created_time=?, completion_time=?"
 )
@@ -42,17 +40,24 @@ func retrievePayment(rows *sql.Rows) (*model.Payment, error) {
 	return nil, nil
 }
 func rowsToPayment(rows *sql.Rows) (*model.Payment, error) {
-	var ds string
+	var ct string
+	var ut string
 	payment := &model.Payment{}
-	err := rows.Scan(&payment.Id, &payment.PaymentMethod, &payment.Status, &ds)
+	err := rows.Scan(&payment.Id, &payment.SourceAccount,&payment.TargetAccount, &payment.Amount, &payment.PaymentMethod,
+		&payment.Status,&payment.OrderNumber, &ct,&ut)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
-	created, err := time.Parse(tool.FORMAT_ISO8601_DATE, ds)
+	createdTime, err := timea.Parse(timea.FORMAT_ISO8601_DATE_TIME, ct)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
-	payment.CreatedTime = created
+	completionTime, err := timea.Parse(timea.FORMAT_ISO8601_DATE_TIME, ut)
+	if err != nil {
+		return nil, errors.Wrap(err, "")
+	}
+	payment.CreatedTime = createdTime
+	payment.CompletionTime = completionTime
 
 	//logger.Log.Debug("rows to Payment:", *payment)
 	return payment, nil
@@ -93,7 +98,6 @@ func (uds *PaymentDataSql) FindAll() ([]model.Payment, error) {
 }
 
 func (uds *PaymentDataSql) Insert(p *model.Payment) (*model.Payment, error) {
-
 	stmt, err := uds.DB.Prepare(INSERT_PAYMENT)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
@@ -113,6 +117,3 @@ func (uds *PaymentDataSql) Insert(p *model.Payment) (*model.Payment, error) {
 	return p, nil
 }
 
-//func (uds *PaymentDataSql) EnableTx(tx dataservice.TxDataInterface) {
-//	uds.DB = tx.GetTx()
-//}

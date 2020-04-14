@@ -12,13 +12,7 @@ CREATE TABLE `payment` (
   `payment_method` varchar(16) default NULL,
   `status` varchar(16) NULL,
   `order_number` varchar(16) default NULL,
-  `created_time` date default NULL,
-  `completion_time` date default NULL,
+  `created_time` DATETIME NOT NULL,
+  `completion_time` DATETIME DEFAULT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-CREATE TABLE `course` (
-  `id` INT(10) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(64) DEFAULT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
