@@ -3,7 +3,8 @@ package app
 import (
 	"database/sql"
 	ycq "github.com/jetbasrawi/go.cqrs"
-	glogger "github.com/jfeng45/glogger/logfactory"
+	"github.com/jfeng45/glogger/logconfig"
+	"github.com/jfeng45/glogger/logfactory"
 	"github.com/jfeng45/gmessaging"
 	"github.com/jfeng45/gmessaging/nat"
 	"github.com/jfeng45/payment/app/config"
@@ -12,8 +13,6 @@ import (
 	"github.com/jfeng45/payment/app/container/servicecontainer"
 	"github.com/jfeng45/payment/app/logger"
 	"github.com/jfeng45/payment/domain/command"
-	"github.com/jfeng45/payment/tool/gdbc"
-	"github.com/jfeng45/payment/tool/gdbc/databasehandler"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"log"
@@ -27,7 +26,7 @@ func InitApp(filename...string) (container.Container, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "loadConfig")
 	}
-	err = initLogger(config)
+	err = initLogger(&config.LogConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func InitApp(filename...string) (container.Container, error) {
 func initContainer(config *config.AppConfig) (container.Container, error) {
 	factoryMap := make(map[string]interface{})
 	c := servicecontainer.ServiceContainer{factoryMap,config}
-	gdbc, err :=initGdbc(&c)
+	gdbc, err :=initGdbc(&c.AppConfig.SQLConfig)
 	if err != nil {
 		return nil,err
 	}
@@ -49,12 +48,12 @@ func initContainer(config *config.AppConfig) (container.Container, error) {
 	c.Put(container.MESSAGING_SERVER, ec)
 	d := initDispatcher()
 	c.Put(container.DISPATCHER, d)
-	loadDispatcher(c)
+	loadDispatcher(&c)
 	return &c, nil
 }
 
-func initLogger (config *config.AppConfig) error{
-	log, err := glogger.InitLogger(config.Log)
+func initLogger (lc *logconfig.LogConfig) error{
+	log, err := logfactory.InitLogger(*lc)
 	if err != nil {
 		return errors.Wrap(err, "loadLogger")
 	}
@@ -62,9 +61,9 @@ func initLogger (config *config.AppConfig) error{
 	return nil
 }
 
-func initGdbc(sc *servicecontainer.ServiceContainer) (gdbc.SqlGdbc,error) {
+func initGdbc(dsc *config.DataStoreConfig) (*sql.DB,error) {
 
-	db, err := sql.Open(sc.AppConfig.SQLConfig.DriverName, sc.AppConfig.SQLConfig.UrlAddress)
+	db, err := sql.Open(dsc.DriverName, dsc.UrlAddress)
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
@@ -73,8 +72,8 @@ func initGdbc(sc *servicecontainer.ServiceContainer) (gdbc.SqlGdbc,error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
-	dt := databasehandler.SqlDBTx{DB: db}
-	return &dt, nil
+	//dt := databasehandler.SqlDBTx{DB: db}
+	return db, nil
 }
 
 func initMessagingService() (gmessaging.MessagingInterface, error) {
@@ -98,7 +97,7 @@ func initDispatcher() ycq.Dispatcher {
 	return dispatcher
 }
 
-func loadDispatcher(c servicecontainer.ServiceContainer) error {
+func loadDispatcher(c container.Container) error {
 	var value interface{}
 	var found bool
 	if value, found = c.Get(container.DISPATCHER); !found {
@@ -107,7 +106,7 @@ func loadDispatcher(c servicecontainer.ServiceContainer) error {
 		return errors.New(message)
 	}
 	d := value.(ycq.Dispatcher)
-	mpuc, err := containerhelper.BuildMakePaymentUseCase(&c)
+	mpuc, err := containerhelper.BuildMakePaymentUseCase(c)
 	if err != nil {
 		return err
 	}

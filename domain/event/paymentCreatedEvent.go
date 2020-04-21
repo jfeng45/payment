@@ -17,11 +17,11 @@ type PaymentCreatedEvent struct {
 	CompletionTime time.Time
 }
 
-func NewPaymentCreatedEvent(p model.Payment) PaymentCreatedEvent{
+func NewPaymentCreatedEvent(p *model.Payment) *PaymentCreatedEvent{
 	pce := PaymentCreatedEvent{p.Id,p.SourceAccount,p.TargetAccount, p.Amount,
 		p.Status, p.PaymentMethod, p.OrderNumber, p.CreatedTime,
 		p.CompletionTime }
-	return pce
+	return &pce
 }
 
 

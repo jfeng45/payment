@@ -33,11 +33,11 @@ const (
 
 // AppConfig represents the application config
 type AppConfig struct {
-	SQLConfig   DataStoreConfig   `yaml:"sqlConfig"`
-	ZapConfig   glogger.LogConfig `yaml:"zapConfig"`
-	LorusConfig glogger.LogConfig `yaml:"logrusConfig"`
-	Log         glogger.LogConfig `yaml:"logConfig"`
-	UseCase     UseCaseConfig     `yaml:"useCaseConfig"`
+	SQLConfig     DataStoreConfig   `yaml:"sqlConfig"`
+	ZapConfig     glogger.LogConfig `yaml:"zapConfig"`
+	LorusConfig   glogger.LogConfig `yaml:"logrusConfig"`
+	LogConfig     glogger.LogConfig `yaml:"logConfig"`
+	UseCaseConfig UseCaseConfig     `yaml:"useCaseConfig"`
 }
 
 // UseCaseConfig represents different use cases

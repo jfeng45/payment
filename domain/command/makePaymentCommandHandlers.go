@@ -14,7 +14,7 @@ func (mpch *MakePaymentCommandHandler) Handle (message ycq.CommandMessage) error
 	switch cmd := message.Command().(type) {
 	case *MakePaymentCommand:
 		payment := cmd.NewPayment()
-		_, err := mpch.Mpuci.MakePayment(&payment)
+		_, err := mpch.Mpuci.MakePayment(payment)
 		if err != nil {
 			logger.Log.Errorf("error in MakePaymentCommandHandler:", err)
 		}

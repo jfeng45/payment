@@ -19,7 +19,7 @@ func (mpu *MakePaymentUseCase) MakePayment(payment *model.Payment) (*model.Payme
 	if err!= nil {
 		return nil, errors.Wrap(err, "")
 	}
-	pce := event.NewPaymentCreatedEvent(*payment)
+	pce := event.NewPaymentCreatedEvent(payment)
 	err = mpu.Mi.Publish(config.SUBJECT_PAYMENT_CREATED, pce)
 	if err != nil {
 		return nil, err

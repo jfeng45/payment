@@ -20,12 +20,12 @@ func main() {
 	if err != nil {
 		log.Println("err:", err)
 	}
-	//testMySql(c)
+	testMySql(c)
 	testSubscribe(c)
 }
 func testMySql(c container.Container) {
-	//testGetPayment(c)
-	testMakePayment(c)
+	testGetPayment(c)
+	//testMakePayment(c)
 }
 func testSubscribe(c container.Container) {
 	var value interface{}

@@ -19,8 +19,8 @@ type MakePaymentCommand struct {
 	CompletionTime time.Time
 }
 
-func (pc *MakePaymentCommand) NewPayment() model.Payment{
-	return model.Payment{pc.Id, pc.SourceAccount, pc.TargetAccount, pc.Amount,
+func (pc *MakePaymentCommand) NewPayment() *model.Payment{
+	return &model.Payment{pc.Id, pc.SourceAccount, pc.TargetAccount, pc.Amount,
 		pc.Status, pc.PaymentMethod, pc.OrderNumber, pc.CreatedTime,
 		pc.CompletionTime}
 
