@@ -6,7 +6,8 @@ import (
 	"github.com/jfeng45/glogger/logconfig"
 	"github.com/jfeng45/glogger/logfactory"
 	"github.com/jfeng45/gmessaging"
-	"github.com/jfeng45/gmessaging/nat"
+	gmessagingConfig "github.com/jfeng45/gmessaging/config"
+	gmessagingFactory "github.com/jfeng45/gmessaging/factory"
 	"github.com/jfeng45/payment/app/config"
 	"github.com/jfeng45/payment/app/container"
 	"github.com/jfeng45/payment/app/container/containerhelper"
@@ -15,7 +16,6 @@ import (
 	"github.com/jfeng45/payment/domain/command"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
-	"log"
 )
 
 // InitApp loads the application configurations from a file and saved it in appConfig and initialize the logger
@@ -76,20 +76,24 @@ func initGdbc(dsc *config.DataStoreConfig) (*sql.DB,error) {
 	return db, nil
 }
 
+//func initMessagingService() (gmessaging.MessagingInterface, error) {
+//	url := config.MESSAGING_SERVER_URL
+//	nc, err :=nats.Connect(url)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	//defer nc.Close()
+//	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+//	if err != nil {
+//		return nil, err
+//	}
+//	nat := nat.Nat{ec}
+//	return nat, nil
+//	//defer ec.Close()
+//}
 func initMessagingService() (gmessaging.MessagingInterface, error) {
-	url := config.MESSAGING_SERVER_URL
-	nc, err :=nats.Connect(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	//defer nc.Close()
-	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-	if err != nil {
-		return nil, err
-	}
-	nat := nat.Nat{ec}
-	return nat, nil
-	//defer ec.Close()
+	config := gmessagingConfig.Messaging{gmessagingConfig.NATS_ENCODED, config.MESSAGING_SERVER_URL, nats.JSON_ENCODER}
+	return gmessagingFactory.Build(&config)
 }
 func initDispatcher() ycq.Dispatcher {
 	// Create the dispatcher
