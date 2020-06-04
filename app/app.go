@@ -3,8 +3,8 @@ package app
 import (
 	"database/sql"
 	ycq "github.com/jetbasrawi/go.cqrs"
-	"github.com/jfeng45/glogger/logconfig"
-	"github.com/jfeng45/glogger/logfactory"
+	logConfig "github.com/jfeng45/glogger/config"
+	logFactory "github.com/jfeng45/glogger/factory"
 	"github.com/jfeng45/gmessaging"
 	gmessagingConfig "github.com/jfeng45/gmessaging/config"
 	gmessagingFactory "github.com/jfeng45/gmessaging/factory"
@@ -52,8 +52,8 @@ func initContainer(config *config.AppConfig) (container.Container, error) {
 	return &c, nil
 }
 
-func initLogger (lc *logconfig.LogConfig) error{
-	log, err := logfactory.InitLogger(*lc)
+func initLogger (lc *logConfig.Logging) error{
+	log, err := logFactory.Build(lc)
 	if err != nil {
 		return errors.Wrap(err, "loadLogger")
 	}
@@ -76,21 +76,6 @@ func initGdbc(dsc *config.DataStoreConfig) (*sql.DB,error) {
 	return db, nil
 }
 
-//func initMessagingService() (gmessaging.MessagingInterface, error) {
-//	url := config.MESSAGING_SERVER_URL
-//	nc, err :=nats.Connect(url)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	//defer nc.Close()
-//	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-//	if err != nil {
-//		return nil, err
-//	}
-//	nat := nat.Nat{ec}
-//	return nat, nil
-//	//defer ec.Close()
-//}
 func initMessagingService() (gmessaging.MessagingInterface, error) {
 	config := gmessagingConfig.Messaging{gmessagingConfig.NATS_ENCODED, config.MESSAGING_SERVER_URL, nats.JSON_ENCODER}
 	return gmessagingFactory.Build(&config)

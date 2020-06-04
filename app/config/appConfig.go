@@ -4,7 +4,7 @@
 package config
 import (
 	"fmt"
-	glogger "github.com/jfeng45/glogger/logconfig"
+	logConfig "github.com/jfeng45/glogger/config"
 	"github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -13,8 +13,6 @@ import (
 // use case code. Need to map to the use case code (UseCaseConfig) in the configuration yaml file.
 // Client app use those to retrieve use case from the container
 const (
-	LOG_CODE          string = "zap"
-	LOG_LEVEL         string = "debug"
 	LOG_ENABLE_CALLER bool   = true
 
 	DB_CONFIG_CODE           = "sql"
@@ -34,9 +32,9 @@ const (
 // AppConfig represents the application config
 type AppConfig struct {
 	SQLConfig     DataStoreConfig   `yaml:"sqlConfig"`
-	ZapConfig     glogger.LogConfig `yaml:"zapConfig"`
-	LorusConfig   glogger.LogConfig `yaml:"logrusConfig"`
-	LogConfig     glogger.LogConfig `yaml:"logConfig"`
+	ZapConfig     logConfig.Logging `yaml:"zapConfig"`
+	LorusConfig   logConfig.Logging `yaml:"logrusConfig"`
+	LogConfig    logConfig.Logging `yaml:"logConfig"`
 	UseCaseConfig UseCaseConfig     `yaml:"useCaseConfig"`
 }
 
@@ -81,7 +79,7 @@ func BuildConfigWithoutFile() (*AppConfig, error) {
 
 	dsc := DataStoreConfig{DB_DRIVER_CODE, DB_DRIVER_NAME,
 		DB_SOURCE_NAME, DB_NAME}
-	lc := glogger.LogConfig{LOG_CODE, LOG_LEVEL, LOG_ENABLE_CALLER}
+	lc := logConfig.Logging{logConfig.ZAP, logConfig.DEBUG, LOG_ENABLE_CALLER}
 	dc := DataConfig{DB_CONFIG_CODE, dsc}
 	pc := PaymentConfig{dc}
 	ucc := UseCaseConfig{pc}
