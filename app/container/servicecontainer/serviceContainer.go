@@ -31,7 +31,7 @@ func (sc *ServiceContainer) BuildUseCase(code string) (interface{}, error) {
 		message := "can't find key= in containier " + container.EVENT_BUS
 		logger.Log.Errorf(message)
 	}
-	ms := value.(gmessaging.MessagingInterface)
+	ms := value.(gmessaging.MessagingEncodedInterface)
 	switch code {
 		case container.USECASE_GET_PAYMENT:
 			uc := getpayment.GetPaymentUseCase{&pds}

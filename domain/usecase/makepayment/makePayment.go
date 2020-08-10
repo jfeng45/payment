@@ -11,7 +11,7 @@ import (
 
 type MakePaymentUseCase struct {
 	PaymentDataInterface dataservice.PaymentDataInterface
-	Mi                   gmessaging.MessagingInterface
+	Mi                   gmessaging.MessagingEncodedInterface
 }
 
 func (mpu *MakePaymentUseCase) MakePayment(payment *model.Payment) (*model.Payment, error) {

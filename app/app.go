@@ -76,9 +76,9 @@ func initGdbc(dsc *config.DataStoreConfig) (*sql.DB,error) {
 	return db, nil
 }
 
-func initMessagingService() (gmessaging.MessagingInterface, error) {
-	config := gmessagingConfig.Messaging{gmessagingConfig.NATS_ENCODED, config.MESSAGING_SERVER_URL, nats.JSON_ENCODER}
-	return gmessagingFactory.Build(&config)
+func initMessagingService() (gmessaging.MessagingEncodedInterface, error) {
+	config := gmessagingConfig.Messaging{gmessagingConfig.CODE_NATS, config.MESSAGING_SERVER_URL, nats.JSON_ENCODER}
+	return gmessagingFactory.BuildEncoded(&config)
 }
 func initDispatcher() ycq.Dispatcher {
 	// Create the dispatcher
